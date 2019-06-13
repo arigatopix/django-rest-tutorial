@@ -14,17 +14,21 @@ def snippet_list(request):
 
     if request.method == 'GET':
         snippets = Snippet.objects.all()
+        """ ดึงข้อมูลจาก model เป็น query object """
         serializer = SnippetSerializer(snippets, many=True)
+        """ แปลง query object เป็น dictionary """
+
         return JsonResponse(serializer.data, safe=False)
         """ แสดงผลเป็น JSON format , safe=False คือยอมให้แสดงผล format ที่ไม่ใช่ dict """
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
-        """ แปลงเป็น dict เก็บลง db """
+        """ แปลงเป็น dict """
         serializer = SnippetSerializer(data=data)
+        """ เอา dict ไป valid คล้ายๆ ModelForm data ที่เข้าไปเช็คใน Serializer ทีละ fields """
 
         if serializer.is_valid():
-            """ ก่อน save ต้อง valid กับ SnippetSerializers ก่อน """
+            """ จะตอบกลับมาเป็น True ถ้าทุก fields เป็นไปตามเงื่อนไขของ Serializer """
             serializer.save()
             return JsonResponse(serializer.data, status=201)
             """ status code 201 คือ create """

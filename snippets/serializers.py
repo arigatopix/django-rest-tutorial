@@ -20,4 +20,9 @@ class SnippetSerializer(serializers.ModelSerializer):
 + JSON to Dict (Deserializer) ต้อง import io.BytesIO
     data = JSONParser().parse(json)
 + Form == Serializer เพื่อ get ข้อมูลจาก DB,  ModelForm = ModelSerialzer เพื่อ update, create ค่า เหมือนกันกับ Django
++ Serializers ...
+- เอาจาก models มาทำเป็น api มาหน้าที่เป็น form คอย valid ข้อมูลนำเข้า
+- แปลงจาก query object ของ django เป็น dict ผ่าน  serializer = SnippetSerializer(snippets, many=True) 
+- แปลงจาก dict เป็น json : JsonResponse(serializer.data, safe=False)
+
 """
