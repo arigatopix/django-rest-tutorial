@@ -11,5 +11,5 @@ router.register(r'groups', views.GroupViewSet)
 # Wire up our API using automatic URL routing เอา routers มาเชื่อมกับ ''/..
 # Additionally, we include login URLs for the browsable API. (login and logout view use browsable API)
 urlpatterns = [
-  path('', include(router.urls)),
+    path('', include(router.urls)),
 ]
