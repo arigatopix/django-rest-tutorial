@@ -1,0 +1,9 @@
+{
+  "python.pythonPath": "C:\\Users\\503015\\.virtualenvs\\django-rest-tutorial-UkDJDGk9\\Scripts\\python.exe",
+  "[python]": {
+    "editor.formatOnSave": true
+  },
+  "python.linting.pylintPath": "/c/Users/503015/.virtualenvs/django-rest-tutorial-UkDJDGk9/Scripts/pylint ",
+  "python.linting.pylintArgs": ["--load-plugins", "pylint_django"],
+  "python.linting.pylintEnabled": true
+}
