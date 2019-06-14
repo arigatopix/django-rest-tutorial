@@ -1,6 +1,6 @@
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
-from rest_framework import mixins, generics
+from rest_framework import generics
 """
 - use mixins build block ของ generics ทำหน้าที่ list, create, retrieve, update, destroy logic
 - generics คือรวบรวม beheviour (list, create, retrieve, update, destroy ของ mixins ไว้แล้ว) เกี่ยวกับ views แสดงผลใน web มี form ให้กรอกด้วย 
@@ -9,10 +9,8 @@ from rest_framework import mixins, generics
 """
 
 
-class SnippetList(mixins.ListModelMixin,
-                mixins.CreateModelMixin,
-                generics.GenericAPIView):
-    """ list and create """
+class SnippetList(generics.ListCreateAPIView):
+    """ list and create แบบไม่ใช้ mixins """
     
     queryset = Snippet.objects.all()
     """ เรียก object ใน models """
@@ -23,30 +21,13 @@ class SnippetList(mixins.ListModelMixin,
         - post จะเช็ค request รับเข้า แล้วก็เช็ค valid เป็นต้น
     """
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
     
-class SnippetDetail(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericAPIView):
+class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     """ 
-    Retrieve คือการ get แบบมี id (รายการเดียว), update or delete a snippet instance.
     - genericAPIView จะ provide function .retrieve(), update() .destroy() แสดงเป็น view
+    - ใช้ generics ในการ Retrieve, update, destroy รวมเป็นอันเดียวเลย generics.RetrieveUpdateDestroyAPIView
     """
 
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
