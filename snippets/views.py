@@ -1,81 +1,65 @@
-# แสดง STATUS CODE พร้อมกับข้อความเช่น HTTP_400_BAD_REQUEST
-from rest_framework import status
-# api_view ใช้ function based view, APIView ใช้ class based (มี viewset ด้วย ช่วยเพิ่ม logic)
-from rest_framework.decorators import api_view
-# ช่วย render response ตามที่ client request มา
-from rest_framework.response import Response
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
+# แสดง STATUS CODE พร้อมกับข้อความเช่น HTTP_400_BAD_REQUEST
+from rest_framework import status
+# Class-based view ช่วยให้สร้าง function ที่สามารถ reuse ได้ ต้องไปแก้ใน url ให้มองเป็น class based view ด้วย
+from rest_framework.views import APIView
+# ช่วย render response ตามที่ client request มา
+from rest_framework.response import Response
 
 
-""" อนุญาตให้ GET, POST ในหน้านี้ """
-@api_view(['GET','POST'])
-def snippet_list(request, format=None):
+class SnippetList(APIView):
     """
-    List all code snippets, or create a new snippet.
+    List all code snippets, or create a new snippet Use class-based view.
     """
 
-    if request.method == 'GET':
+    def get(self, request, format=None):
+        """ คล้ายๆ เดิม ไม่ต้องเช็ค request.method """
         snippets = Snippet.objects.all()
-        """ ดึงข้อมูลจาก model เป็น query object """
+        """ retrieve data from models """
         serializer = SnippetSerializer(snippets, many=True)
-        """ แปลง query object เป็น dictionary """
-
+        """ object to dict """
         return Response(serializer.data)
-        """ Response แทน JsonResponse ได้เลย ส่งค่า JSON """
-
-    elif request.method == 'POST':
+    
+    def post(self, request, formant=None):
         serializer = SnippetSerializer(data=request.data)
-        """ 
-        - บรรทัดนี้บอกว่าเอาข้อมูลจาก request ไป Serializer
-        - request.data จะ Handles data. Work for POST, PUT, DELETE
-        """
 
         if serializer.is_valid():
-            """ จะตอบกลับมาเป็น True ถ้าทุก fields เป็นไปตามเงื่อนไขของ Serializer """
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            """ status เปลี่ยนให้ชัดเจนมากขึ้นโดยใช้ method ของ rest_framework """
+        return Response(serializer.erros, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-        """ ถ้า invalid ส่งค่า error กับ 400 Bad Request """
-
-
-""" อนุญาตให้ GET, PUT, DELETE """
-@api_view(['GET', 'PUT', 'DELETE'])
-def snippet_detail(request, pk, format=None):
+class SnippetDetail(APIView):
+    """ 
+    Retrieve, update or delete a snippet instance.
     """
-    - Retrieve, update or delete a code snippet. คือต้องระบุ pk เพื่อ update, delete
-     - format ช่วยระบุ format ใน url เช่น snippents/1.json โดย format = ['api',] หรือ ใส่ None ก็จะไม่ระบุว่าจะเป็น format อะไร
-        - สามารถ post , get ด้วย Content-type Header แบบไหน เช่น application/json หรือ http/text
-        - ต้องไป register ใน url format_suffix_patterns
-        - ตัวอย่าง http://127.0.0.1:8000/snippets/1.json
-    """
-    # for
-    try:
-        snippet = Snippet.objects.get(pk=pk)
-        """ เรียก object ตาม id """
-    except Snippet.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
+    def get_object(self, pk):
+        """ ทดลอง get ตาม primary key ที่ request มา """
+        try:
+            return Snippet.objects.get(pk=pk)
+        except Snippet.DoseNotExist:
+            """ ไม่พบ ส่ง page 404 """
+            raise Http404
+    
+    def get(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        """ รับ request และเรียก function get_object ด้านบน เอา object มา"""
         serializer = SnippetSerializer(snippet)
-        """ ดึงจาก model เป็น dict """
+        """ แปลงจาก object เป็น dict. """
+
         return Response(serializer.data)
-        """ แปลงเป็น JSON """
 
-    elif request.method == 'PUT':
+    def put(self, request, pk, format=None):
+        snippet = self.get_object(pk)
         serializer = SnippetSerializer(snippet, data=request.data)
-        """
-        - รับค่าจาก client
-        - check ค่าที่รับมา validated_data กับ  SnippetSerializer
-        """
-
+        """ replace snippet ของเดิมด้วย request.data """
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, pk, format=None):
+        snippet = self.get_object(pk)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
