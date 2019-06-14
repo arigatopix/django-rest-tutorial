@@ -7,5 +7,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('quickstart.urls')),
     path('snippets/', include('snippets.urls')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+]
+
+# เพิ่ม Login Button มุมบนขวา ใช้ += ไม่ว่าจะไปหน้าไหนก็จะมีปุ่ม login
+# จะเพิ่ม urls /users/ อัตโนมัติ
+urlpatterns += [
+    path('api-auth/', include('rest_framework.urls')),
 ]
