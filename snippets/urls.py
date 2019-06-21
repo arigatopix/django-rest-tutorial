@@ -23,4 +23,5 @@ schema_view = get_schema_view(title='Pastebin API')
 urlpatterns = [
     path('', include(router.urls)),
     path('schema/', schema_view),
+    path('login/', views.UserLoginApiView.as_view())
 ]

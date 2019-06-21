@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, permissions, renderers
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.settings import api_settings
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer, UserSerializer
 from snippets.permissions import IsOwnerOrReadOnly
@@ -12,13 +15,15 @@ class SnippetViewSet(viewsets.ModelViewSet):
     This viewset automatically provides `list`, `detail`, `retrieve`, `update`, `destroy` actions
     * ต้องไป set ใน url ว่าแต่ละ ViewSets จะใช้กับ method ใดได้บ้าง
     """
-    
+
     queryset = Snippet.objects.all()
     """ เรียก object ใน models """
     serializer_class = SnippetSerializer
     """ queryset และ serializer_class จะเป็น logic ในการ get, post และ save ลง db"""
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, )
-    
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, )
+    authentication_classes = (TokenAuthentication, )
+
     @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     def highlight(self, request, *args, **kwargs):
         """ เป็น field ที่สั่งให้ render Html (สร้าง html ตาม models) """
@@ -39,6 +44,12 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = (TokenAuthentication, )
+
+
+class UserLoginApiView(ObtainAuthToken):
+    renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
 
 """ 
 ViewSets or View
