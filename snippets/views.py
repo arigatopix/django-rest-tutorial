@@ -6,6 +6,7 @@ from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer, UserSerializer
 from snippets.permissions import IsOwnerOrReadOnly
 """
+- @api_view เรียกว่า decorator ใช้กับ function based views, APIView สำหรับ class-based views
 - use mixins build block ของ generics ทำหน้าที่ list, create, retrieve, update, destroy logic
 - generics คือรวบรวม beheviour (list, create, retrieve, update, destroy ของ mixins ไว้แล้ว) เกี่ยวกับ views แสดงผลใน web มี form ให้กรอกด้วย 
 - จะช่วยลดการเขียน code เพราะว่า django_rest จะรวม behaviour ที่ backend ใช้บ่อยๆ รวมไปในตัวเลย  เพราะ django รู้ว่าเราจะทำงาน create/retrieve/update/delete operations กับ model เสมอ

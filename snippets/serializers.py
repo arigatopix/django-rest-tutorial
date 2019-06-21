@@ -10,7 +10,8 @@ class SnippetSerializer(serializers.ModelSerializer):
         - imprements from create() and update() method
     """
 
-    owner = serializers.CharField(read_only=True)
+    owner = serializers.ReadOnlyField(source='owner.username')
+    # owner = serializers.CharField(read_only=True)
     """ ตั้งค่า validate สำหรับ fields owner เพื่อรับค่าจาก api """
 
     class Meta:

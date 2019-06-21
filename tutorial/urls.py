@@ -6,7 +6,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('quickstart.urls')),
-    path('snippets/', include('snippets.urls')),
+    path('', include('snippets.urls')),
 ]
 
 # เพิ่ม Login Button มุมบนขวา ใช้ += ไม่ว่าจะไปหน้าไหนก็จะมีปุ่ม login
