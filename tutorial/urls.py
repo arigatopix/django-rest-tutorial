@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import Route
+# * ไม่ต้อง import urls ของ app
 
-# ! ไม่ต้อง import urls ของ app
 
 urlpatterns = [
     path('admin/', admin.site.urls),

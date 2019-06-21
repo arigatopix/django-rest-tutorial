@@ -1,34 +1,50 @@
 from django.urls import path
-# set format สำหรับแสดงผล
 from rest_framework.urlpatterns import format_suffix_patterns
-from snippets import views
+from snippets.views import SnippetViewSet, UserViewSet
+
+# กำหนด set of views ของ ViewSets และเอาไปใส่ใน path url (ในส่วนของ view) จะทำ method ใดได้บ้าง
+# creating multiple views from each ViewSet class, binding the http methods
+snippet_list = SnippetViewSet.as_view({
+    'get' : 'list',
+    'post' : 'create'
+})
+
+snippet_detail = SnippetViewSet.as_view({
+    'get' : 'retrieve',
+    'post' : 'create',
+    'patch' : 'partial_update',
+    'delete' : 'destroy',
+})
+
+snippet_highlight = SnippetViewSet.as_view({
+    'get' : 'highlight',
+})
+
+user_list = UserViewSet.as_view({
+    'get' : 'list'
+})
+
+user_detail = UserViewSet.as_view({
+    'get' : 'retrieve'
+})
+
 
 urlpatterns = [
-    # path('', views.api_root),
     path('snippets/',
-        views.SnippetList.as_view(),
+        snippet_list,
         name='snippet-list'),
     path('snippets/<int:pk>',
-        views.SnippetDetail.as_view(),
+        snippet_detail,
         name='snippet-detail'),
     path('snippets/<int:pk>/highlight/',
-        views.SnippetHighlight.as_view(),
+        snippet_highlight,
         name='snippet-highlight'),
     path('users/',
-        views.UserList.as_view(),
+        user_list,
         name='user-list'),
     path('users/<int:pk>',
-        views.UserDetail.as_view(),
+        user_detail,
         name='user-detail'),
 ]
 
-""" 
-- ใช้ Hyperlinked API ต้องใส่ชื่อ name เพื่อระบุว่า url จะเรียก class view อันไหน  
-    - root API ใช้ {models}-list
-    - Serializer API ใช้ {models}-{field}
-    - url อื่นๆ API ใช้ {models}-detail
-"""
-
-
 urlpatterns = format_suffix_patterns(urlpatterns)
-""" ตั้งค่าให้แสดงผล รับค่าได้ทุก format (เสริม request.data ที่สามารถรับ data ได้ทุก format) """
