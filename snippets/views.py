@@ -39,3 +39,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+""" 
+ViewSets or View
+- ต้องการแสดงผล มากกว่า config url เอง
+- แสดงผล และสร้างให้เหนภาพรวดเร็ว ไม่ต้องการกำหนด view แต่ละตัวแบบเฉพาะเจาะจง
+ """

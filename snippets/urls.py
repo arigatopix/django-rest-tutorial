@@ -1,50 +1,19 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
-from snippets.views import SnippetViewSet, UserViewSet
+from rest_framework.routers import DefaultRouter
+from snippets import views
 
-# กำหนด set of views ของ ViewSets และเอาไปใส่ใน path url (ในส่วนของ view) จะทำ method ใดได้บ้าง
-# creating multiple views from each ViewSet class, binding the http methods
-snippet_list = SnippetViewSet.as_view({
-    'get' : 'list',
-    'post' : 'create'
-})
+# ใช้ DefaultRouter เพื่อ Bind และคิดให้อัตโนมัติว่า pattern จะเป็นยังไง ???
 
-snippet_detail = SnippetViewSet.as_view({
-    'get' : 'retrieve',
-    'post' : 'create',
-    'patch' : 'partial_update',
-    'delete' : 'destroy',
-})
+# Create a router and register our viewsets with it.
+# แค่ register viewset ตัว Rest จะทำให้กำหนด method และ url ให้
+# custom ได้ เช่น
+# path('snippets/<int:pk>/custom/', views.SnippetViewSet.as_view({ 'get' : 'retrieve'}), name='snippet-highlight'),
+router = DefaultRouter()
+router.register(r'snippets', views.SnippetViewSet)
+router.register(r'users', views.UserViewSet)
 
-snippet_highlight = SnippetViewSet.as_view({
-    'get' : 'highlight',
-})
-
-user_list = UserViewSet.as_view({
-    'get' : 'list'
-})
-
-user_detail = UserViewSet.as_view({
-    'get' : 'retrieve'
-})
-
-
+# The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path('snippets/',
-        snippet_list,
-        name='snippet-list'),
-    path('snippets/<int:pk>',
-        snippet_detail,
-        name='snippet-detail'),
-    path('snippets/<int:pk>/highlight/',
-        snippet_highlight,
-        name='snippet-highlight'),
-    path('users/',
-        user_list,
-        name='user-list'),
-    path('users/<int:pk>',
-        user_detail,
-        name='user-detail'),
+    path('', include(router.urls)),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)
