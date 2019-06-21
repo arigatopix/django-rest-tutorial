@@ -4,43 +4,34 @@ from rest_framework import serializers
 from .models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
-class SnippetSerializer(serializers.ModelSerializer):
+class SnippetSerializer(serializers.HyperlinkedModelSerializer):
     """ 
         - ModelSerializer จะ add field model validate ให้เลย ไม่ต้องประกาศ แต่ละ fields แบบละเอียด 
         - imprements from create() and update() method
+        - HyperlinkedModelSerializer แทน ModelSerializer ทำให้แต่ละ enitities เชื่อมกัน โดยมี link ให้อัตโนมัติ แต่จะไม่มี field id ของ models ให้
+        - HyperlinkedIdentifyField คือ class ที่ต้องระบุว่า ให้ link ไปที่ views name อันไหน
     """
 
     owner = serializers.ReadOnlyField(source='owner.username')
-    # owner = serializers.CharField(read_only=True)
     """ ตั้งค่า validate สำหรับ fields owner เพื่อรับค่าจาก api """
+    highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
+    """
+    * view-name ตั้งชื่อให้ตรงกับ urls ที่สร้าง โดย snippet-hightlight ไปเชื่อมกับ SnippetHighlight
+    * ห้ามพิมพ์ผิด !!!
+    highlight จะเป็น field URL โดยมี format เป็น html
+    """
 
     class Meta:
         model = Snippet
-        fields = ('id', 'title', 'code', 'linenos', 'language', 'style','owner',)
+        fields = ('id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlight')
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     """ เอา User models มาทำเป็น serializers และเพิ่ม snippets เข้าไปอีก field นึง
      """
-    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
-    """ เพิ่ม relationship ไปใน User models """
+    snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
+    """ fields สำหรับแสดงรายละเอียดว่า user นี้มี record อะไรบ้าง โดยใช้ HyperlinkedRelatedField จะแสดงผลเป็น url ใน field """
+
 
     class Meta:
         model = User
         fields = ('id', 'username', 'snippets')
-
-
-
-"""
-+ Dict to JSON
-    json = JSONRenderer().render(serializer.data)
-+ JSON to Dict (Deserializer) ต้อง import io.BytesIO
-    data = JSONParser().parse(json)
-+ Form == Serializer เพื่อ get ข้อมูลจาก DB,  ModelForm = ModelSerialzer เพื่อ update, create ค่า เหมือนกันกับ Django
-+ Serializers ...
-- เอาจาก models มาทำเป็น api มาหน้าที่เป็น form คอย valid ข้อมูลนำเข้า
--- ส่งออก
-- แปลงจาก query object ของ django เป็น dict ผ่าน  serializer = SnippetSerializer(snippets, many=True) 
-- แปลงจาก dict เป็น json : JsonResponse(serializer.data, safe=False)
--- รับเข้า
-data = JSONParser().parse(request)
-"""
