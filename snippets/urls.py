@@ -3,7 +3,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.routers import DefaultRouter
 from snippets import views
 
-# ใช้ DefaultRouter เพื่อ Bind และคิดให้อัตโนมัติว่า pattern จะเป็นยังไง ???
+# ใช้ DefaultRouter เพื่อ Bind และคิดให้อัตโนมัติว่า pattern จะเป็นยังไง
+# อ่านต่อ เรื่อง {models}-list,{models}-detail
 
 # Create a router and register our viewsets with it.
 # แค่ register viewset ตัว Rest จะทำให้กำหนด method และ url ให้
